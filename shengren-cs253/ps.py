@@ -150,9 +150,12 @@ class ProblemSet2_2_Welcome(webapp2.RequestHandler):
         username = self.request.get('username')
         self.response.write('Welcome, %s!' % username)
 
+import GoogleAppEngineTutorial
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/ps1', ProblemSet1),
                                ('/ps2', ProblemSet2),
                                ('/ps2_2', ProblemSet2_2),
-                               ('/ps2_2_welcome', ProblemSet2_2_Welcome)
+                               ('/ps2_2_welcome', ProblemSet2_2_Welcome),
+                               ('/gaet', GoogleAppEngineTutorial.GoogleAppEngineTutorial),
                               ], debug = True)
