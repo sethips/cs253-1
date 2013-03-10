@@ -152,10 +152,15 @@ class ProblemSet2_2_Welcome(webapp2.RequestHandler):
 
 import GoogleAppEngineTutorial
 
+import ProblemSet3
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/ps1', ProblemSet1),
                                ('/ps2', ProblemSet2),
                                ('/ps2_2', ProblemSet2_2),
                                ('/ps2_2_welcome', ProblemSet2_2_Welcome),
                                ('/gaet', GoogleAppEngineTutorial.GoogleAppEngineTutorial),
+                               ('/ps3', ProblemSet3.ProblemSet3),
+                               ('/ps3/newpost', ProblemSet3.ProblemSet3_NewPost),
+                               (r'/ps3/(\d+)', ProblemSet3.ProblemSet3_Post),
                               ], debug = True)

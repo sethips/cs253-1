@@ -1,0 +1,11 @@
+<!DOCTYPE HTML>
+<html>
+  <body>
+    {% for blog in blogs %}
+      <br>
+      <p>{{ blog.subject }}</p>
+      <p>{{ blog.created }}</p>
+      <p>{{ blog.content }}</p>
+    {% endfor %}
+  </body>
+</html>
