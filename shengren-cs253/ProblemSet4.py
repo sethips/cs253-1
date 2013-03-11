@@ -47,7 +47,7 @@ class ProblemSet4_Signup(webapp2.RequestHandler):
             h = hashlib.sha256(password).hexdigest()
             self.response.headers.add_header('Set-Cookie', \
                                              'account=%s|%s' % (str(username), h))
-            self.redirect('/ps4/welcome')
+            self.redirect('/ps3/welcome') # Changed to ps3 for PS5 submission
         else:
             template_values = {
                 'username': username,
@@ -80,7 +80,7 @@ class ProblemSet4_Login(webapp2.RequestHandler):
         if account and username == account.split('|')[0]:
             h = hashlib.sha256(password).hexdigest()
             if h == account.split('|')[1]:
-                self.redirect('/ps4/welcome')
+                self.redirect('/ps3/welcome') # Changed to ps3 for PS5 submission
                 return
         error = 'Invalid login'
         template_values = {
@@ -91,5 +91,5 @@ class ProblemSet4_Login(webapp2.RequestHandler):
 class ProblemSet4_Logout(webapp2.RequestHandler):
     def get(self):
         self.response.headers.add_header('Set-Cookie', 'account=;Path=/')
-        self.redirect('/ps4/signup')
+        self.redirect('/ps3/signup') # Changed to ps3 for PS5 submission
 

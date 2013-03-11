@@ -156,6 +156,8 @@ import ProblemSet3
 
 import ProblemSet4
 
+import ProblemSet5
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/ps1', ProblemSet1),
                                ('/ps2', ProblemSet2),
@@ -165,8 +167,10 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/ps3', ProblemSet3.ProblemSet3),
                                ('/ps3/newpost', ProblemSet3.ProblemSet3_NewPost),
                                (r'/ps3/(\d+)', ProblemSet3.ProblemSet3_Post),
-                               ('/ps4/signup', ProblemSet4.ProblemSet4_Signup),
-                               ('/ps4/welcome', ProblemSet4.ProblemSet4_Welcome),
-                               ('/ps4/login', ProblemSet4.ProblemSet4_Login),
-                               ('/ps4/logout', ProblemSet4.ProblemSet4_Logout),
+                               ('/ps3/signup', ProblemSet4.ProblemSet4_Signup),
+                               ('/ps3/welcome', ProblemSet4.ProblemSet4_Welcome),
+                               ('/ps3/login', ProblemSet4.ProblemSet4_Login),
+                               ('/ps3/logout', ProblemSet4.ProblemSet4_Logout),
+                               ('/ps3/.json', ProblemSet5.AllPosts),
+                               (r'/ps3/(\d+).json', ProblemSet5.SinglePost),
                               ], debug = True)
