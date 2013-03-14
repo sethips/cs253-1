@@ -15,6 +15,12 @@ class User(db.Model):
     pw_hash = db.StringProperty(required = True)
     email = db.StringProperty()
 
+class Page(db.Model):
+    entry = db.StringProperty(required = True)
+    author = db.StringProperty(required = True)
+    content = db.TextProperty(required = True)
+    timestamp = db.DateTimeProperty(auto_now_add = True)
+
 class MyHandler(webapp2.RequestHandler):
     def render(self, template, template_values = {}):
         self.response.out.write(template.render(template_values))
@@ -113,15 +119,60 @@ class Login(MyHandler):
 class Logout(MyHandler):
     def get(self):
         self.response.headers.add_header('Set-Cookie', 'user=')
-        self.redirect('/signup')
+        self.redirect('/login')
 
 class EditPage(MyHandler):
-    def get(self, entry_string):
-        self.render('EditPage ' + entry_string)
+    template = jinja_environment.get_template('EditPage.html')
+    def get(self, entry):
+        self.render(self.template)
+    def post(self, entry):
+        content = self.request.get('content')
+        error = ''
+        user_from_cookie = self.request.cookies.get('user')
+        if user_from_cookie:
+            if len(user_from_cookie.split('|')) == 2:
+                username, pw_hash = user_from_cookie.split('|')
+                user_key = db.Key.from_path('User', username)
+                user = db.get(user_key)
+                if user:
+                    if pw_hash == user.pw_hash:
+                        if content:
+                            page = Page(key_name = entry,
+                                        entry = entry,
+                                        author = username,
+                                        content = content)
+                            page.put()
+                            self.redirect('/' + entry)
+                            return
+                        else:
+                            error = 'Content cannot be empty'
+                    else:
+                        error = 'Username and password do not match'
+                else:
+                    error = 'User does not exist'
+            else:
+                error = 'Invalid cookie'
+        else:
+            error = 'Login first'
+        template_values = {
+            'content': content,
+            'error': error,
+            }
+        self.render(self.template, template_values)
 
 class WikiPage(MyHandler):
-    def get(self, entry_string):
-        self.render('WikiPage ' + entry_string)
+    template = jinja_environment.get_template('WikiPage.html')
+    def get(self, entry):
+        fetch_back = db.GqlQuery('SELECT * FROM Page ORDER BY timestamp DESC LIMIT 1')
+        fetch_back = list(fetch_back)
+        if len(fetch_back) == 1:
+            page = fetch_back[0]
+            template_values = {
+                'content': page.content,
+                }
+            self.render(template, template_values)
+        else:
+            self.redirect('/_edit/' + entry)
 
 PAGE_RE = r'/((?:[a-zA-Z0-9_-]+/?)*)'
 app = webapp2.WSGIApplication([('/signup', Signup),
