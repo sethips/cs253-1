@@ -8,7 +8,8 @@ from google.appengine.ext import db
 
 jinja_environment = jinja2.Environment(
     loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    autoescape = True)
+    )
+    #autoescape = True)
 
 class User(db.Model):
     username = db.StringProperty(required = True)
@@ -75,7 +76,7 @@ class Signup(MyHandler):
             user.put()
             self.response.headers.add_header(\
                 'Set-Cookie', 'user=%s|%s' % (str(username), pw_hash))
-            self.response.out.write('Pass')
+            self.redirect('/')
         else:
             template_values = {
                 'username': username,
@@ -103,7 +104,7 @@ class Login(MyHandler):
                 if pw_hash == user.pw_hash:
                     self.response.headers.add_header(\
                         'Set-Cookie', 'user=%s|%s' % (str(username), pw_hash))
-                    self.response.out.write('Pass')
+                    self.redirect('/')
                     return
                 else:
                     error = 'Wrong password'
@@ -124,7 +125,17 @@ class Logout(MyHandler):
 class EditPage(MyHandler):
     template = jinja_environment.get_template('EditPage.html')
     def get(self, entry):
-        self.render(self.template)
+        fetch_back = db.GqlQuery(\
+            "SELECT * FROM Page WHERE entry = '%s' ORDER BY timestamp DESC LIMIT 1" % entry)
+        fetch_back = list(fetch_back)
+        content = ''
+        if len(fetch_back) == 1:
+            page = fetch_back[0]
+            content = page.content
+        template_values = {
+            'content': content,
+            }
+        self.render(self.template, template_values)
     def post(self, entry):
         content = self.request.get('content')
         error = ''
@@ -142,7 +153,7 @@ class EditPage(MyHandler):
                                         author = username,
                                         content = content)
                             page.put()
-                            self.redirect('/' + entry)
+                            self.redirect(entry)
                             return
                         else:
                             error = 'Content cannot be empty'
@@ -163,18 +174,19 @@ class EditPage(MyHandler):
 class WikiPage(MyHandler):
     template = jinja_environment.get_template('WikiPage.html')
     def get(self, entry):
-        fetch_back = db.GqlQuery('SELECT * FROM Page ORDER BY timestamp DESC LIMIT 1')
+        fetch_back = db.GqlQuery(\
+            "SELECT * FROM Page WHERE entry = '%s' ORDER BY timestamp DESC LIMIT 1" % entry)
         fetch_back = list(fetch_back)
         if len(fetch_back) == 1:
             page = fetch_back[0]
             template_values = {
                 'content': page.content,
                 }
-            self.render(template, template_values)
+            self.render(self.template, template_values)
         else:
-            self.redirect('/_edit/' + entry)
+            self.redirect('/_edit' + entry)
 
-PAGE_RE = r'/((?:[a-zA-Z0-9_-]+/?)*)'
+PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 app = webapp2.WSGIApplication([('/signup', Signup),
                                ('/login', Login),
                                ('/logout', Logout),
