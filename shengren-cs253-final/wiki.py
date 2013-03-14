@@ -148,8 +148,7 @@ class EditPage(MyHandler):
                 if user:
                     if pw_hash == user.pw_hash:
                         if content:
-                            page = Page(key_name = entry,
-                                        entry = entry,
+                            page = Page(entry = entry,
                                         author = username,
                                         content = content)
                             page.put()
@@ -186,11 +185,27 @@ class WikiPage(MyHandler):
         else:
             self.redirect('/_edit' + entry)
 
+class HistoryPage(MyHandler):
+    template = jinja_environment.get_template('HistoryPage.html')
+    def get(self, entry):
+        fetch_back = db.GqlQuery(\
+            "SELECT * FROM Page WHERE entry = '%s' ORDER BY timestamp DESC" % entry)
+        fetch_back = list(fetch_back)
+        if len(fetch_back) > 0:
+            pages = fetch_back
+            template_values = {
+                'pages': pages
+                }
+            self.render(self.template, template_values)
+        else:
+            self.redirect('/_edit' + entry)
+
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 app = webapp2.WSGIApplication([('/signup', Signup),
                                ('/login', Login),
                                ('/logout', Logout),
                                ('/_edit' + PAGE_RE, EditPage),
+                               ('/_history' + PAGE_RE, HistoryPage),
                                (PAGE_RE, WikiPage),
                               ], debug = True)
 
