@@ -158,6 +158,8 @@ import ProblemSet4
 
 import ProblemSet5
 
+import ProblemSet6
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/ps1', ProblemSet1),
                                ('/ps2', ProblemSet2),
@@ -173,4 +175,5 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/ps3/logout', ProblemSet4.ProblemSet4_Logout),
                                ('/ps3/.json', ProblemSet5.AllPosts),
                                (r'/ps3/(\d+).json', ProblemSet5.SinglePost),
+                               ('/ps3/flush', ProblemSet6.Flush),
                               ], debug = True)
